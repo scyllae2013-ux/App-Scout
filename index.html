@@ -574,5 +574,24 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js');
 }
 </script>
+  <div id="backup-bar" style="display:flex;gap:8px;justify-content:center;padding:10px;background:#fef3c7;position:sticky;top:0;z-index:9999">
+  <button onclick="scaricaBackup()" style="background:#16a34a;color:white;padding:8px 12px;border-radius:10px;font-weight:700">⬇️ Backup</button>
+  <label style="background:#2563eb;color:white;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer">⬆️ Ripristina<input type="file" accept=".json" onchange="ripristinaBackup(event)" style="display:none"></label>
+</div>
+<script>
+function scaricaBackup(){
+  const dati = {};
+  for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); dati[k]=localStorage.getItem(k); }
+  const blob = new Blob([JSON.stringify(dati,null,2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup-scout-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+  alert('Backup scaricato! ✅');
+}
+function ripristinaBackup(e){
+  const file = e.target.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = function(){ try{ const dati=JSON.parse(r.result); localStorage.clear(); for(const k in dati){ localStorage.setItem(k,dati[k]); } alert('Backup ripristinato! Ricarico... ✅'); location.reload(); }catch(err){ alert('File non valido!'); } };
+  r.readAsText(file);
+}
+</script>
 </body>
 </html>
